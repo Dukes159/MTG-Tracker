@@ -1,0 +1,153 @@
+body.bg-light {
+    background-color: var(--bs-body-bg) !important;
+    color: var(--bs-body-color);
+}
+
+[data-theme-toggle] {
+    position: fixed;
+    left: max(1rem, env(safe-area-inset-left));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: 1080;
+    color: var(--bs-body-color) !important;
+    background-color: var(--bs-body-bg) !important;
+    border: 1px solid var(--bs-border-color) !important;
+    box-shadow: 0 .25rem .75rem rgb(0 0 0 / 20%);
+}
+
+[data-theme-toggle]:hover,
+[data-theme-toggle]:focus-visible {
+    color: var(--bs-body-color) !important;
+    background-color: var(--bs-tertiary-bg) !important;
+}
+
+.card-img-top {
+    background-color: var(--bs-tertiary-bg) !important;
+}
+
+.collection-card-body {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+.collection-card-title {
+    margin: 0 0 .35rem;
+    font-size: 1rem;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.collection-card-meta {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    min-height: 1.25rem;
+    color: var(--bs-secondary-color);
+    font-size: .75rem;
+    line-height: 1.4;
+}
+
+.collection-meta-separator {
+    color: var(--bs-border-color);
+}
+
+.collection-card-treatment {
+    margin-top: .65rem;
+}
+
+.collection-card-treatment .badge {
+    padding: .35em .65em;
+    color: var(--bs-emphasis-color);
+    background: var(--bs-tertiary-bg);
+    border: 1px solid var(--bs-border-color);
+    font-size: .68rem;
+    font-weight: 550;
+}
+
+.collection-card-prices {
+    margin-top: .85rem;
+    padding: .7rem .75rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: .5rem;
+    background: var(--bs-tertiary-bg);
+}
+
+.collection-price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: .5rem;
+    font-size: .8rem;
+}
+
+.collection-price-label {
+    color: var(--bs-secondary-color);
+}
+
+.collection-price-label span {
+    margin-left: .2rem;
+    font-size: .68rem;
+}
+
+.collection-price-value {
+    color: var(--bs-emphasis-color);
+    font-weight: 650;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.collection-price-value a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.collection-price-value a:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.collection-price-secondary {
+    margin-top: .35rem;
+    font-size: .75rem;
+}
+
+.collection-price-empty {
+    color: var(--bs-secondary-color);
+    font-size: .75rem;
+}
+
+.collection-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .5rem;
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.collection-quantity {
+    display: flex;
+    align-items: baseline;
+    gap: .45rem;
+    color: var(--bs-secondary-color);
+    font-size: .75rem;
+}
+
+.collection-quantity strong {
+    color: var(--bs-emphasis-color);
+    font-size: .9rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.collection-remove {
+    font-size: .72rem;
+}
+
+.oracle-text {
+    color: var(--bs-body-color);
+    background-color: var(--bs-tertiary-bg) !important;
+}
+
+.face-section {
+    border-bottom-color: var(--bs-border-color) !important;
+}

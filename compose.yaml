@@ -1,0 +1,14 @@
+services:
+  mtg-tracker:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${MTG_TRACKER_PORT:-9006}:9006"
+    environment:
+      MTG_TRACKER_SECRET_KEY: ${MTG_TRACKER_SECRET_KEY:?Set MTG_TRACKER_SECRET_KEY in .env}
+      MTG_TRACKER_DB_PATH: /data/collection.db
+    volumes:
+      - mtg_tracker_data:/data
+
+volumes:
+  mtg_tracker_data:

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confirm Add - {{ card.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='theme.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <style>
+        .card-preview-img { max-width: 300px; height: auto; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">MTG Collection Tracker</a>
+            <button type="button" class="btn btn-outline-light ms-auto" data-theme-toggle>Dark theme</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm p-4 text-center">
+                    <h2 class="mb-4">{{ card.name }}</h2>
+                    <img src="{{ card.normalized_image_url }}" class="card-preview-img mx-auto mb-4" alt="{{ card.name }}">
+                    
+                    <form action="/add_card" method="post">
+                        <input type="hidden" name="scryfall_id" value="{{ card.id }}">
+                        
+                        <div class="mb-3 text-start">
+                            <label class="form-label">Treatment</label>
+                            <select name="treatment" class="form-select">
+                                <option value="Non-Foil">Non-Foil</option>
+                                <option value="Foil">Foil</option>
+                                <option value="Etched">Etched</option>
+                                <option value="Borderless">Borderless</option>
+                                <option value="Full Art">Full Art</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4 text-start">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" name="quantity" class="form-control" value="1" min="1">
+                        </div>
+                        
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a href="/search" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Confirm Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

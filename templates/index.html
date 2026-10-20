@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MTG Collection</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='theme.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <style>
+        .card-img-top { height: 300px; object-fit: contain; background: #eee; }
+        .mtg-card { transition: transform 0.2s; cursor: pointer; }
+        .mtg-card:hover { transform: scale(1.05); }
+        .filter-panel > summary { cursor: pointer; list-style: none; }
+        .filter-panel > summary::-webkit-details-marker { display: none; }
+        .filter-panel > summary::after { content: '+'; float: right; font-size: 1.25rem; line-height: 1; }
+        .filter-panel[open] > summary::after { content: '−'; }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container d-flex align-items-center flex-wrap gap-2">
+            <a class="navbar-brand" href="/">MTG Collection Tracker</a>
+            <span class="text-light ms-auto">Profile: <strong>{{ active_profile.name }}</strong></span>
+            <button type="button" class="btn btn-outline-light" data-theme-toggle>Dark theme</button>
+            <a class="btn btn-outline-light" href="/profiles">Switch Profile</a>
+            <a class="btn btn-outline-light" href="/search">Add New Card</a>
+            <a class="btn btn-outline-info" href="/import">Import Collection</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <div class="text-muted small">Card Kingdom retail and buylist prices are saved snapshots.</div>
+            <form action="/refresh_prices" method="post">
+                <button type="submit" class="btn btn-outline-primary">Refresh Card Kingdom prices</button>
+            </form>
+        </div>
+        <details class="card shadow-sm mb-4 filter-panel" {% if filters_active %}open{% endif %}>
+            <summary class="card-header">
+                <span class="fw-semibold">Filters and sorting</span>
+                <span class="text-muted small ms-2">Showing {{ collection|length }} of {{ total_count }} entries</span>
+            </summary>
+            <form action="/" method="get" class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label for="filter-name" class="form-label">Card name</label>
+                    <input id="filter-name" type="search" name="q" class="form-control" placeholder="Search names..." value="{{ filters.q }}">
+                </div>
+                <div class="col-12 col-md-6 col-lg-2">
+                    <label for="filter-set" class="form-label">Set</label>
+                    <select id="filter-set" name="set" class="form-select">
+                        <option value="">All sets</option>
+                        {% for set_name in sets %}
+                        <option value="{{ set_name }}" {% if filters.set == set_name %}selected{% endif %}>{{ set_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-4 col-lg-2">
+                    <label for="filter-rarity" class="form-label">Rarity</label>
+                    <select id="filter-rarity" name="rarity" class="form-select">
+                        <option value="">All rarities</option>
+                        {% for rarity in rarities %}
+                        <option value="{{ rarity }}" {% if filters.rarity == rarity %}selected{% endif %}>{{ rarity|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-4 col-lg-2">
+                    <label for="filter-treatment" class="form-label">Treatment</label>
+                    <select id="filter-treatment" name="treatment" class="form-select">
+                        <option value="">All treatments</option>
+                        {% for treatment in treatments %}
+                        <option value="{{ treatment }}" {% if filters.treatment == treatment %}selected{% endif %}>{{ treatment }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-4 col-lg-3">
+                    <label for="sort" class="form-label">Sort by</label>
+                    <select id="sort" name="sort" class="form-select">
+                        <option value="name_asc" {% if sort == 'name_asc' %}selected{% endif %}>Name (A–Z)</option>
+                        <option value="name_desc" {% if sort == 'name_desc' %}selected{% endif %}>Name (Z–A)</option>
+                        <option value="set_asc" {% if sort == 'set_asc' %}selected{% endif %}>Set (A–Z)</option>
+                        <option value="rarity_asc" {% if sort == 'rarity_asc' %}selected{% endif %}>Rarity</option>
+                        <option value="quantity_asc" {% if sort == 'quantity_asc' %}selected{% endif %}>Quantity (low to high)</option>
+                        <option value="quantity_desc" {% if sort == 'quantity_desc' %}selected{% endif %}>Quantity (high to low)</option>
+                        <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Card Kingdom price (low to high)</option>
+                        <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Card Kingdom price (high to low)</option>
+                    </select>
+                </div>
+                <div class="col-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                    <a href="/" class="btn btn-outline-secondary">Clear filters</a>
+                </div>
+            </div>
+            </form>
+        </details>
+
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4">
+            {% for card in collection %}
+            <div class="col">
+                <div class="card h-100 mtg-card shadow-sm" onclick="window.location.href='/card/{{ card.scryfall_id }}'">
+                    <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}">
+                    <div class="card-body collection-card-body">
+                        <h2 class="collection-card-title">{{ card.name }}</h2>
+                        <div class="collection-card-meta">
+                            <span>{{ card.set_name }}</span>
+                            <span class="collection-meta-separator" aria-hidden="true">·</span>
+                            <span>{{ card.rarity|title }}</span>
+                        </div>
+                        <div class="collection-card-treatment">
+                            <span class="badge">{{ card.treatment }}</span>
+                        </div>
+                        {% if card.cardkingdom_retail is not none or card.cardkingdom_buylist is not none %}
+                        <div class="collection-card-prices">
+                            <div class="collection-price-row">
+                                <span class="collection-price-label">Retail <span>NM</span></span>
+                                <span class="collection-price-value">
+                                    {% if card.cardkingdom_url %}<a href="{{ card.cardkingdom_url }}" target="_blank" rel="noopener" onclick="event.stopPropagation();">{% endif %}
+                                    {% if card.cardkingdom_retail is not none %}${{ '%.2f'|format(card.cardkingdom_retail) }}{% else %}No listing{% endif %}
+                                    {% if card.cardkingdom_url %}</a>{% endif %}
+                                </span>
+                            </div>
+                            <div class="collection-price-row collection-price-secondary">
+                                <span class="collection-price-label">Buylist</span>
+                                <span class="collection-price-value">{% if card.cardkingdom_buylist is not none %}${{ '%.2f'|format(card.cardkingdom_buylist) }}{% else %}Not buying{% endif %}</span>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="collection-card-prices collection-price-empty">Card Kingdom price not refreshed</div>
+                        {% endif %}
+                        <div class="collection-card-footer">
+                            <span class="collection-quantity"><span>In collection</span><strong>{{ card.quantity }}</strong></span>
+                            <a href="/delete/{{ card.scryfall_id }}" 
+                               class="btn btn-sm btn-outline-danger collection-remove" 
+                               onclick="event.stopPropagation();">Remove</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if total_count == 0 %}
+        <div class="text-center py-5">
+            <h3>Your collection is empty!</h3>
+            <a href="/search" class="btn btn-primary">Start Adding Cards</a>
+        </div>
+        {% elif not collection %}
+        <div class="text-center py-5">
+            <h3>No cards match these filters</h3>
+            <a href="/" class="btn btn-outline-secondary">Clear filters</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

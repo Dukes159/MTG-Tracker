@@ -1,0 +1,9 @@
+.env
+.git
+.venv
+venv
+__pycache__
+*.py[cod]
+*.zip
+work
+server.log
